@@ -1,0 +1,295 @@
+# CA3 form mapping — formulaire n° 3310-CA3-SD
+# Canonical source: CERFA 3310-CA3-SD (DGFiP)
+#
+# vat_type_mapping: each classified VAT type maps to:
+#   base_line : CA3 field receiving the base HT (null = not included)
+#   tva_line  : CA3 field receiving the TVA amount (null = excluded)
+#   cadre_a   : Cadre A line to include base in (optional)
+#
+# form_lines: definition of every CA3 line with label, computation, and rate.
+#
+# validation_rules: hard errors and warnings applied after computation.
+
+# ── VAT type → CA3 line mapping ─────────────────────────────────────────────
+
+vat_type_mapping:
+
+  # Taux normal 20 %
+  collectee_20:
+    base_line: L08
+    tva_line:  L16
+    cadre_a:   A1
+    description: "TVA collectée taux normal 20%"
+
+  # Taux intermédiaire 10 %
+  collectee_10:
+    base_line: L09B
+    tva_line:  L17B
+    cadre_a:   A2
+    description: "TVA collectée taux intermédiaire 10%"
+
+  # Taux réduit 5,5 %
+  collectee_55:
+    base_line: L09
+    tva_line:  L17
+    cadre_a:   A2
+    description: "TVA collectée taux réduit 5,5%"
+
+  # Taux particulier 2,1 %
+  collectee_21:
+    base_line: L10
+    tva_line:  L18
+    cadre_a:   A2
+    description: "TVA collectée taux particulier 2,1%"
+
+  # Taux super-réduit 0,85 % (presse — mapped to L10/L18 for MVP)
+  collectee_085:
+    base_line: L10
+    tva_line:  L18
+    cadre_a:   A2
+    description: "TVA collectée taux 0,85% (presse) — regroupé avec 2,1% ligne 10"
+
+  # TVA déductible sur autres biens et services (20%)
+  deductible_20:
+    base_line: ~
+    tva_line:  L20
+    description: "TVA déductible 20% sur achats et charges"
+
+  # TVA déductible sur autres biens et services (10%)
+  deductible_10:
+    base_line: ~
+    tva_line:  L20
+    description: "TVA déductible 10% sur achats et charges"
+
+  # TVA déductible sur autres biens et services (5,5%)
+  deductible_55:
+    base_line: ~
+    tva_line:  L20
+    description: "TVA déductible 5,5% sur achats et charges"
+
+  # TVA déductible sur immobilisations
+  deductible_immo:
+    base_line: ~
+    tva_line:  L19
+    description: "TVA déductible sur immobilisations"
+
+  # TVA intracommunautaire déductible (acquisitions UE)
+  deductible_intracom:
+    base_line: A3
+    tva_line:  L20
+    description: "TVA intracommunautaire déductible (AIC)"
+
+  # Autoliquidation — débit (TVA collectée par le donneur d'ordre)
+  autoliquidation_debit:
+    base_line: L08
+    tva_line:  L16
+    cadre_a:   A1
+    description: "Autoliquidation TVA — compte à TVA collectée (BTP, sous-traitance, AIC)"
+
+  # Autoliquidation — crédit (TVA déductible corrélée)
+  autoliquidation_credit:
+    base_line: ~
+    tva_line:  L20
+    description: "Autoliquidation TVA — compte à TVA déductible corrélée"
+
+  # Régularisations TVA (sens quelconque)
+  regularisation:
+    base_line: ~
+    tva_line:  L14
+    description: "Régularisations TVA (ligne 14)"
+
+  # Non déductible (véhicules de tourisme, frais de représentation, etc.)
+  non_deductible:
+    base_line: ~
+    tva_line:  ~
+    description: "TVA non déductible — exclue de la déclaration"
+
+  # Hors champ TVA (financier, salaires, exceptionnel)
+  hors_champ:
+    base_line: ~
+    tva_line:  ~
+    description: "Hors champ TVA — exclue de la déclaration"
+
+  # Ambiguïté non résolue — traitée comme hors champ avec warning
+  ambiguous:
+    base_line: ~
+    tva_line:  ~
+    description: "Classification ambiguë — ignorée avec warning"
+
+# ── CA3 form line definitions ────────────────────────────────────────────────
+
+form_lines:
+
+  # Cadre A — Montant des opérations réalisées
+  A1:
+    label: "Ventes et prestations de services (taux normal)"
+    type: base_ht
+    description: "Cumul des bases HT soumises au taux normal (20%)"
+
+  A2:
+    label: "Autres opérations imposables"
+    type: base_ht
+    description: "Cumul des bases HT soumises aux taux réduits (10%, 5.5%, 2.1%)"
+
+  A3:
+    label: "Acquisitions intracommunautaires"
+    type: base_ht
+    description: "Acquisitions de biens en provenance de l'UE (hors France)"
+
+  A4:
+    label: "Livraisons intracommunautaires (exonérées)"
+    type: base_ht
+    description: "Livraisons de biens vers d'autres États membres — exonérées"
+
+  A5:
+    label: "Exportations hors UE (exonérées)"
+    type: base_ht
+    description: "Exportations de biens hors Union européenne"
+
+  # Cadre B — Bases HT imposables
+  L08:
+    label: "Opérations imposables à 20%"
+    type: base_ht
+    rate: "0.20"
+    tva_line: L16
+    description: "Base imposable au taux normal de 20%"
+
+  L09:
+    label: "Opérations imposables à 5,5%"
+    type: base_ht
+    rate: "0.055"
+    tva_line: L17
+    description: "Base imposable au taux réduit de 5,5%"
+
+  L09B:
+    label: "Opérations imposables à 10%"
+    type: base_ht
+    rate: "0.10"
+    tva_line: L17B
+    description: "Base imposable au taux intermédiaire de 10%"
+
+  L10:
+    label: "Opérations imposables à 2,1%"
+    type: base_ht
+    rate: "0.021"
+    tva_line: L18
+    description: "Base imposable au taux particulier de 2,1%"
+
+  # Cadre B — TVA collectée
+  L16:
+    label: "Dont TVA à 20%"
+    type: tva_collectee
+    formula: "sum(collectee_20.tva + autoliquidation_debit.tva)"
+    description: "TVA collectée au taux normal 20%"
+
+  L17:
+    label: "Dont TVA à 5,5%"
+    type: tva_collectee
+    formula: "sum(collectee_55.tva)"
+    description: "TVA collectée au taux réduit 5,5%"
+
+  L17B:
+    label: "Dont TVA à 10%"
+    type: tva_collectee
+    formula: "sum(collectee_10.tva)"
+    description: "TVA collectée au taux intermédiaire 10%"
+
+  L18:
+    label: "Dont TVA à 2,1%"
+    type: tva_collectee
+    formula: "sum(collectee_21.tva + collectee_085.tva)"
+    description: "TVA collectée au taux particulier 2,1%"
+
+  L14:
+    label: "Régularisations"
+    type: regularisation
+    description: "Régularisations diverses (positives ou négatives)"
+
+  L15:
+    label: "Total TVA brute due"
+    type: computed
+    formula: "L16 + L17 + L17B + L18 + L14"
+    description: "Total TVA collectée avant déduction"
+
+  # Cadre B — TVA déductible
+  L19:
+    label: "TVA déductible sur immobilisations"
+    type: tva_deductible
+    description: "TVA sur acquisitions d'immobilisations (terrain, matériel, etc.)"
+
+  L20:
+    label: "TVA déductible sur autres biens et services"
+    type: tva_deductible
+    description: "TVA sur achats courants, charges, acquisitions intracommunautaires"
+
+  L22:
+    label: "Total TVA déductible"
+    type: computed
+    formula: "L19 + L20"
+    description: "Somme de toutes les déductions TVA"
+
+  L23:
+    label: "Crédit TVA antérieur reporté"
+    type: input
+    description: "Crédit de TVA issu de la déclaration du mois précédent"
+
+  L24:
+    label: "TVA nette due"
+    type: computed
+    formula: "max(0, L15 - L22 - L23)"
+    description: "TVA à verser au Trésor si positif"
+
+  L25:
+    label: "Crédit de TVA"
+    type: computed
+    formula: "max(0, L22 + L23 - L15)"
+    description: "Crédit de TVA à reporter ou à rembourser si > seuil"
+
+# ── Validation rules ────────────────────────────────────────────────────────
+
+validation_rules:
+
+  hard_errors:
+    - id: neg_tva_collectee
+      line: L15
+      condition: "L15 < 0"
+      message: "La TVA collectée totale (ligne 15) ne peut pas être négative"
+
+    - id: l15_internal_inconsistency
+      condition: "L15 != L16 + L17 + L17B + L18 + L14"
+      message: "Incohérence interne : ligne 15 ≠ somme(16, 17, 17B, 18, 14)"
+
+  warnings:
+    - id: high_deductible_ratio
+      condition: "L22 / L15 > 0.80 if L15 > 0 else False"
+      threshold: 0.80
+      message: "TVA déductible / TVA collectée > 80% — ratio anormal, vérifier les déclarations"
+
+    - id: ambiguous_entries_present
+      condition: "ambiguous_count > 0"
+      message: "Des écritures non classifiées (ambiguous) ont été ignorées — vérifier manuellement"
+
+    - id: refund_request_mensuelle
+      condition: "L25 >= 1500 and period_type == 'mensuelle'"
+      threshold_eur: 1500
+      message: "Crédit TVA ≥ 1 500 € en régime mensuel — remboursement suggéré (article 242-0 A)"
+
+    - id: refund_request_trimestrielle
+      condition: "L25 >= 760 and period_type == 'trimestrielle'"
+      threshold_eur: 760
+      message: "Crédit TVA ≥ 760 € en régime trimestriel — remboursement suggéré (article 242-0 A)"
+
+# ── Refund thresholds (Cadre D) ─────────────────────────────────────────────
+
+refund_thresholds:
+  mensuelle:     1500   # EUR — article 242-0 A annexe II CGI
+  trimestrielle: 760    # EUR — même article
+  annuelle:      150    # EUR — pour les régimes annuels
+
+# ── Engine metadata ─────────────────────────────────────────────────────────
+
+engine:
+  version: "ca3-v1.0"
+  cerfa: "3310-CA3-SD"
+  reference: "CGI art. 271, 283 — Annexe II art. 205 à 242-0 L"
+  last_reviewed: "2025-05-31"

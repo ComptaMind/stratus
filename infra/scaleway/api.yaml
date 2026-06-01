@@ -1,0 +1,52 @@
+# Scaleway Serverless Container — Stratus API (NestJS)
+# Deploy with: scw container container deploy --from-file infra/scaleway/api.yaml
+#
+# Prerequisites:
+#   scw iam api-key create  (save in SCALEWAY_API_KEY)
+#   scw registry namespace create stratus
+#   docker push rg.fr-par.scw.cloud/stratus/api:latest
+
+apiVersion: serverless.scaleway.com/v1beta1
+kind: Container
+metadata:
+  name: stratus-api
+  namespace: stratus
+
+spec:
+  image: rg.fr-par.scw.cloud/stratus/api:latest
+  region: fr-par
+
+  scaling:
+    minScale: 1
+    maxScale: 5
+    concurrency: 50
+
+  resources:
+    memoryLimit: 512
+    cpuLimit: 280  # mVCPU
+
+  port: 3001
+
+  privacy: public
+
+  environmentVariables:
+    NODE_ENV: production
+    PORT: "3001"
+    # Injected via Doppler / Scaleway secrets at deploy time:
+    # DATABASE_URL
+    # CLERK_SECRET_KEY
+    # SENTRY_DSN
+    # WEB_URL
+    # RESEND_API_KEY
+
+  httpOption: redirected  # Force HTTPS
+
+  # Health check for Scaleway load balancer
+  healthCheck:
+    httpProbe:
+      path: /health
+    port: 3001
+    failureThreshold: 3
+    successThreshold: 1
+    periodSeconds: 30
+    timeoutSeconds: 5

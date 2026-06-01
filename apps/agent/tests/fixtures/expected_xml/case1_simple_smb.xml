@@ -1,0 +1,92 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<Echange xmlns="urn:dgfip:edi:tva:ca3:v1" version="1.0">
+  <Entete>
+    <SiretEmetteur>12345678901234</SiretEmetteur>
+    <IntituleEmetteur>Société Test SARL</IntituleEmetteur>
+    <DacIntent>LIQ</DacIntent>
+    <Regime>TVA-CA3</Regime>
+    <Periode>
+      <DateDebut>2025-01-01</DateDebut>
+      <DateFin>2025-01-31</DateFin>
+    </Periode>
+    <DateEmission>2025-02-05</DateEmission>
+    <Identifiant>client-test-001</Identifiant>
+  </Entete>
+  <Declaration cerfa="3310-CA3-SD">
+    <CadreA ref="A">
+      <Ligne ref="A1">
+        <Montant>10000.00</Montant>
+      </Ligne>
+      <Ligne ref="A2">
+        <Montant>0.00</Montant>
+      </Ligne>
+      <Ligne ref="A3">
+        <Montant>0.00</Montant>
+      </Ligne>
+      <Ligne ref="A4">
+        <Montant>0.00</Montant>
+      </Ligne>
+      <Ligne ref="A5">
+        <Montant>0.00</Montant>
+      </Ligne>
+    </CadreA>
+    <CadreB ref="B">
+      <Ligne ref="L08">
+        <Montant>10000.00</Montant>
+      </Ligne>
+      <Ligne ref="L09">
+        <Montant>0.00</Montant>
+      </Ligne>
+      <Ligne ref="L09B">
+        <Montant>0.00</Montant>
+      </Ligne>
+      <Ligne ref="L10">
+        <Montant>0.00</Montant>
+      </Ligne>
+      <Ligne ref="L14">
+        <Montant>0.00</Montant>
+      </Ligne>
+      <Ligne ref="L15">
+        <Montant>2000.00</Montant>
+      </Ligne>
+      <Ligne ref="L16">
+        <Montant>2000.00</Montant>
+      </Ligne>
+      <Ligne ref="L17">
+        <Montant>0.00</Montant>
+      </Ligne>
+      <Ligne ref="L17B">
+        <Montant>0.00</Montant>
+      </Ligne>
+      <Ligne ref="L18">
+        <Montant>0.00</Montant>
+      </Ligne>
+      <Ligne ref="L19">
+        <Montant>0.00</Montant>
+      </Ligne>
+      <Ligne ref="L20">
+        <Montant>1000.00</Montant>
+      </Ligne>
+      <Ligne ref="L22">
+        <Montant>1000.00</Montant>
+      </Ligne>
+      <Ligne ref="L23">
+        <Montant>0.00</Montant>
+      </Ligne>
+      <Ligne ref="L24">
+        <Montant>1000.00</Montant>
+      </Ligne>
+      <Ligne ref="L25">
+        <Montant>0.00</Montant>
+      </Ligne>
+    </CadreB>
+    <CadreD ref="D">
+      <RemboursementDemande>false</RemboursementDemande>
+      <RemboursementMontant>0.00</RemboursementMontant>
+    </CadreD>
+  </Declaration>
+  <Signature>
+    <Algorithm>SHA-256</Algorithm>
+    <DigestValue>sapbtEl6vPY+HJ4faXZ5FT4wcIQpOJfQqSxtrKGnh6E=</DigestValue>
+  </Signature>
+</Echange>

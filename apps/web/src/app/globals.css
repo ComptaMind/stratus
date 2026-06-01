@@ -1,0 +1,97 @@
+@import "tailwindcss";
+
+/* ── Design tokens — dark default, light optional ──────────────────────────── */
+:root {
+  --bg:        #0f1117;
+  --bg-card:   #1a1d27;
+  --bg-input:  #232635;
+  --border:    #2d3148;
+  --fg:        #e8eaf0;
+  --fg-muted:  #8b90a8;
+  --accent:    #6366f1;   /* indigo-500 */
+  --accent-hover: #4f46e5;
+  --success:   #10b981;
+  --warning:   #f59e0b;
+  --danger:    #ef4444;
+  --radius:    0.5rem;
+}
+
+[data-theme="light"] {
+  --bg:        #f8f9fc;
+  --bg-card:   #ffffff;
+  --bg-input:  #f1f3f9;
+  --border:    #e2e5f0;
+  --fg:        #111827;
+  --fg-muted:  #6b7280;
+}
+
+html { color-scheme: dark; }
+[data-theme="light"] { color-scheme: light; }
+
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Utility classes used across UI ──────────────────────────────────────────── */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: #fff;
+  border-radius: var(--radius);
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: background 150ms;
+  border: none;
+  cursor: pointer;
+}
+.btn-primary:hover { background: var(--accent-hover); }
+.btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.btn-ghost {
+  background: transparent;
+  color: var(--fg-muted);
+  border-radius: var(--radius);
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: background 150ms, color 150ms;
+  border: 1px solid var(--border);
+  cursor: pointer;
+}
+.btn-ghost:hover { background: var(--bg-input); color: var(--fg); }
+
+.input {
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--fg);
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  width: 100%;
+  outline: none;
+  transition: border-color 150ms;
+}
+.input:focus { border-color: var(--accent); }
+.input::placeholder { color: var(--fg-muted); }
+
+/* ── Scrollbar ───────────────────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+/* ── SSE streaming cursor ───────────────────────────────────────────────────── */
+@keyframes blink { 0%,100% { opacity:1 } 50% { opacity:0 } }
+.streaming::after {
+  content: "▋";
+  animation: blink 1s infinite;
+  color: var(--accent);
+}

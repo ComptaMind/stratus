@@ -1,0 +1,51 @@
+JournalCode|JournalLib|EcritureNum|EcritureDate|CompteNum|CompteLib|CompAuxNum|CompAuxLib|PieceRef|PieceDate|EcritureLib|Debit|Credit|EcritureLet|DateLet|ValidDate|Montantdevise|Idevise
+AC|Achats|1|20260102|401000|Fournisseurs généraux|FOUR001|Fournisseur A|FAC-001|20260101|Facture fournitures|0,00|1200,00||||0,00|EUR
+AC|Achats|1|20260102|606100|Achats fournitures bureau|||FAC-001|20260101|Facture fournitures|1000,00|0,00||||0,00|EUR
+AC|Achats|1|20260102|445660|TVA déductible sur ABS|||FAC-001|20260101|Facture fournitures|200,00|0,00||||0,00|EUR
+AC|Achats|2|20260103|401000|Fournisseurs généraux|FOUR002|Fournisseur B|FAC-002|20260103|Facture marchandises|0,00|600,00||||0,00|EUR
+AC|Achats|2|20260103|607000|Achats de marchandises|||FAC-002|20260103|Facture marchandises|500,00|0,00||||0,00|EUR
+AC|Achats|2|20260103|445660|TVA déductible sur ABS|||FAC-002|20260103|Facture marchandises|100,00|0,00||||0,00|EUR
+AC|Achats|3|20260105|401000|Fournisseurs généraux|FOUR003|Fournisseur C|FAC-003|20260105|Loyer janvier|0,00|2400,00||||0,00|EUR
+AC|Achats|3|20260105|613500|Locations mobilières|||FAC-003|20260105|Loyer janvier|2000,00|0,00||||0,00|EUR
+AC|Achats|3|20260105|445660|TVA déductible sur ABS|||FAC-003|20260105|Loyer janvier|400,00|0,00||||0,00|EUR
+VT|Ventes|4|20260106|411000|Clients|CLI001|Client X|FACT-001|20260106|Prestation conseil|2400,00|0,00||||0,00|EUR
+VT|Ventes|4|20260106|706100|Prestations de services|||FACT-001|20260106|Prestation conseil|0,00|2000,00||||0,00|EUR
+VT|Ventes|4|20260106|445710|TVA collectée|||FACT-001|20260106|Prestation conseil|0,00|400,00||||0,00|EUR
+VT|Ventes|5|20260108|411000|Clients|CLI002|Client Y|FACT-002|20260108|Formation|1200,00|0,00||||0,00|EUR
+VT|Ventes|5|20260108|706200|Commissions|||FACT-002|20260108|Formation|0,00|1000,00||||0,00|EUR
+VT|Ventes|5|20260108|445710|TVA collectée|||FACT-002|20260108|Formation|0,00|200,00||||0,00|EUR
+VT|Ventes|6|20260110|411000|Clients|CLI003|Client Z|FACT-003|20260110|Audit fiscal|600,00|0,00||||0,00|EUR
+VT|Ventes|6|20260110|706300|Redevances|||FACT-003|20260110|Audit fiscal|0,00|500,00||||0,00|EUR
+VT|Ventes|6|20260110|445710|TVA collectée|||FACT-003|20260110|Audit fiscal|0,00|100,00||||0,00|EUR
+BQ|Banque|7|20260115|401000|Fournisseurs généraux|FOUR001|Fournisseur A|VIR-001|20260115|Règlement FAC-001|1200,00|0,00||||0,00|EUR
+BQ|Banque|7|20260115|512000|Banque|||VIR-001|20260115|Règlement FAC-001|0,00|1200,00||||0,00|EUR
+BQ|Banque|8|20260116|401000|Fournisseurs généraux|FOUR002|Fournisseur B|VIR-002|20260116|Règlement FAC-002|600,00|0,00||||0,00|EUR
+BQ|Banque|8|20260116|512000|Banque|||VIR-002|20260116|Règlement FAC-002|0,00|600,00||||0,00|EUR
+BQ|Banque|9|20260117|512000|Banque|||VIR-003|20260117|Encaissement FACT-001|2400,00|0,00||||0,00|EUR
+BQ|Banque|9|20260117|411000|Clients|CLI001|Client X|VIR-003|20260117|Encaissement FACT-001|0,00|2400,00||||0,00|EUR
+AC|Achats|10|20260118|401000|Fournisseurs généraux|FOUR004|Fournisseur D|FAC-004|20260118|Publicité|0,00|840,00||||0,00|EUR
+AC|Achats|10|20260118|623100|Publicité|||FAC-004|20260118|Publicité|700,00|0,00||||0,00|EUR
+AC|Achats|10|20260118|445660|TVA déductible sur ABS|||FAC-004|20260118|Publicité|140,00|0,00||||0,00|EUR
+AC|Achats|11|20260120|401000|Fournisseurs généraux|FOUR005|Fournisseur E|FAC-005|20260120|Entretien locaux|0,00|1680,00||||0,00|EUR
+AC|Achats|11|20260120|615000|Entretien et réparations|||FAC-005|20260120|Entretien locaux|1400,00|0,00||||0,00|EUR
+AC|Achats|11|20260120|445660|TVA déductible sur ABS|||FAC-005|20260120|Entretien locaux|280,00|0,00||||0,00|EUR
+AC|Achats|12|20260122|401000|Fournisseurs généraux|FOUR006|Fournisseur F|FAC-006|20260122|Assurance|0,00|360,00||||0,00|EUR
+AC|Achats|12|20260122|616000|Primes d assurance|||FAC-006|20260122|Assurance|300,00|0,00||||0,00|EUR
+AC|Achats|12|20260122|445660|TVA déductible sur ABS|||FAC-006|20260122|Assurance|60,00|0,00||||0,00|EUR
+VT|Ventes|13|20260123|411000|Clients|CLI004|Client W|FACT-004|20260123|Conseil fiscal|3000,00|0,00||||0,00|EUR
+VT|Ventes|13|20260123|706400|Prestations juridiques|||FACT-004|20260123|Conseil fiscal|0,00|2500,00||||0,00|EUR
+VT|Ventes|13|20260123|445710|TVA collectée|||FACT-004|20260123|Conseil fiscal|0,00|500,00||||0,00|EUR
+VT|Ventes|14|20260124|411000|Clients|CLI005|Client V|FACT-005|20260124|Formation e-learning|480,00|0,00||||0,00|EUR
+VT|Ventes|14|20260124|706500|Produits annexes|||FACT-005|20260124|Formation e-learning|0,00|400,00||||0,00|EUR
+VT|Ventes|14|20260124|445710|TVA collectée|||FACT-005|20260124|Formation e-learning|0,00|80,00||||0,00|EUR
+VT|Ventes|15|20260125|411000|Clients|CLI006|Client U|FACT-006|20260125|Accompagnement|960,00|0,00||||0,00|EUR
+VT|Ventes|15|20260125|706600|Produits accessoires|||FACT-006|20260125|Accompagnement|0,00|800,00||||0,00|EUR
+VT|Ventes|15|20260125|445710|TVA collectée|||FACT-006|20260125|Accompagnement|0,00|160,00||||0,00|EUR
+BQ|Banque|16|20260127|512000|Banque|||VIR-004|20260127|Encaissement FACT-004|3000,00|0,00||||0,00|EUR
+BQ|Banque|16|20260127|411000|Clients|CLI004|Client W|VIR-004|20260127|Encaissement FACT-004|0,00|3000,00||||0,00|EUR
+BQ|Banque|17|20260128|401000|Fournisseurs généraux|FOUR004|Fournisseur D|VIR-005|20260128|Règlement FAC-004|840,00|0,00||||0,00|EUR
+BQ|Banque|17|20260128|512000|Banque|||VIR-005|20260128|Règlement FAC-004|0,00|840,00||||0,00|EUR
+BQ|Banque|18|20260129|401000|Fournisseurs généraux|FOUR006|Fournisseur F|VIR-006|20260129|Règlement FAC-006|360,00|0,00||||0,00|EUR
+BQ|Banque|18|20260129|512000|Banque|||VIR-006|20260129|Règlement FAC-006|0,00|360,00||||0,00|EUR
+BQ|Banque|19|20260130|512000|Banque|||VIR-007|20260130|Encaissement FACT-005|480,00|0,00||||0,00|EUR
+BQ|Banque|19|20260130|411000|Clients|CLI005|Client V|VIR-007|20260130|Encaissement FACT-005|0,00|480,00||||0,00|EUR

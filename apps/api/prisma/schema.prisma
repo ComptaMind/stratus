@@ -1,0 +1,242 @@
+// Stratus — Prisma schema
+// Multi-tenant: every entity carries orgId for row-level isolation.
+// Financial amounts: Decimal(14,2). Timestamps: Timestamptz(6).
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ── 1. Organization ───────────────────────────────────────────────────────────
+
+model Organization {
+  id                String   @id @default(cuid())
+  clerkOrgId        String   @unique
+  name              String
+  countryDefault    String   @default("FR")
+  vatRegimeDefault  String?  // 'réel normal' | 'réel simplifié' | 'franchise'
+  siret             String?
+  siren             String?
+  createdAt         DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt         DateTime @updatedAt @db.Timestamptz(6)
+
+  users           User[]
+  fiscalClients   FiscalClient[]
+  fecImports      FECImport[]
+  ca3Declarations CA3Declaration[]
+  auditEvents     AuditEvent[]
+
+  @@map("organizations")
+}
+
+// ── 2. User ───────────────────────────────────────────────────────────────────
+
+model User {
+  id          String       @id @default(cuid())
+  clerkUserId String       @unique
+  email       String       @unique
+  orgId       String
+  org         Organization @relation(fields: [orgId], references: [id])
+  createdAt   DateTime     @default(now()) @db.Timestamptz(6)
+  updatedAt   DateTime     @updatedAt @db.Timestamptz(6)
+
+  fecImports FECImport[]
+
+  @@index([orgId])
+  @@map("users")
+}
+
+// ── 3. FiscalClient ───────────────────────────────────────────────────────────
+// A client company managed by an accounting firm (Organization).
+
+model FiscalClient {
+  id              String       @id @default(cuid())
+  orgId           String
+  org             Organization @relation(fields: [orgId], references: [id])
+  name            String
+  siren           String?
+  vatNumber       String?
+  // 'réel normal' | 'réel simplifié' | 'franchise'
+  vatRegime       String
+  country         String       @default("FR")
+  fiscalYearStart String       @default("01-01") // MM-DD
+  createdAt       DateTime     @default(now()) @db.Timestamptz(6)
+  updatedAt       DateTime     @updatedAt @db.Timestamptz(6)
+
+  fecImports      FECImport[]
+  ca3Declarations CA3Declaration[]
+
+  @@index([orgId])
+  @@map("fiscal_clients")
+}
+
+// ── 4. FECImport ──────────────────────────────────────────────────────────────
+// One uploaded FEC file.
+
+model FECImport {
+  id               String       @id @default(cuid())
+  orgId            String
+  org              Organization @relation(fields: [orgId], references: [id])
+  fiscalClientId   String
+  fiscalClient     FiscalClient @relation(fields: [fiscalClientId], references: [id])
+  filename         String
+  fileUrl          String       // Scaleway Object Storage (S3-compatible)
+  periodStart      DateTime     @db.Timestamptz(6)
+  periodEnd        DateTime     @db.Timestamptz(6)
+  // 'mensuelle' | 'trimestrielle'
+  periodType       String       @default("mensuelle")
+  // 'pending' | 'parsed' | 'classified' | 'failed'
+  status           String       @default("pending")
+  entriesCount     Int          @default(0)
+  errorMessage     String?
+  uploadedByUserId String
+  uploadedBy       User         @relation(fields: [uploadedByUserId], references: [id])
+  createdAt        DateTime     @default(now()) @db.Timestamptz(6)
+
+  entries FECEntry[]
+
+  @@index([orgId])
+  @@map("fec_imports")
+}
+
+// ── 5. FECEntry ───────────────────────────────────────────────────────────────
+// One journal line from a FEC file.
+
+model FECEntry {
+  id            String    @id @default(cuid())
+  orgId         String    // denormalized for RLS
+  fecImportId   String
+  fecImport     FECImport @relation(fields: [fecImportId], references: [id])
+  journalCode   String
+  journalLib    String
+  ecritureNum   String
+  ecritureDate  DateTime  @db.Date
+  compteNum     String    // e.g. '445660'
+  compteLib     String
+  compAuxNum    String?
+  compAuxLib    String?
+  pieceRef      String?
+  pieceDate     DateTime? @db.Date
+  ecritureLib   String
+  debit         Decimal   @db.Decimal(14, 2)
+  credit        Decimal   @db.Decimal(14, 2)
+  lettrage      String?
+  dateLet       DateTime? @db.Date
+  validDate     DateTime? @db.Date
+  montantDevise Decimal?  @db.Decimal(14, 2)
+  codeDevise    String?
+  createdAt     DateTime  @default(now()) @db.Timestamptz(6)
+
+  classification VATClassification?
+
+  @@index([fecImportId, compteNum])
+  @@index([orgId])
+  @@map("fec_entries")
+}
+
+// ── 6. VATClassification ─────────────────────────────────────────────────────
+// AI classification result for one FEC entry.
+
+model VATClassification {
+  id    String   @id @default(cuid())
+  orgId String   // denormalized for RLS
+
+  fecEntryId String   @unique
+  fecEntry   FECEntry @relation(fields: [fecEntryId], references: [id])
+
+  // 'collectée 20' | 'collectée 10' | 'collectée 5.5' | 'collectée 2.1'
+  // 'déductible biens 20' | 'déductible biens 10'
+  // 'déductible services 20' | 'déductible services 10'
+  // 'intracom acquisition' | 'intracom livraison'
+  // 'autoliquidation BTP' | 'non soumise' | 'export' | 'import'
+  vatType         String
+  baseHt          Decimal @db.Decimal(14, 2)
+  tvaAmount       Decimal @db.Decimal(14, 2)
+  confidence      Float   // 0.0 – 1.0
+  modelUsed       String  // e.g. 'claude-haiku-4-5'
+  reasoning       String  @db.Text
+  humanReviewed   Boolean @default(false)
+  humanOverridden Boolean @default(false)
+  createdAt       DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt       DateTime @updatedAt @db.Timestamptz(6)
+
+  @@index([orgId])
+  @@map("vat_classifications")
+}
+
+// ── 7. CA3Declaration ─────────────────────────────────────────────────────────
+// One computed/filed CA3 monthly VAT declaration.
+
+model CA3Declaration {
+  id             String       @id @default(cuid())
+  orgId          String
+  org            Organization @relation(fields: [orgId], references: [id])
+  fiscalClientId String
+  fiscalClient   FiscalClient @relation(fields: [fiscalClientId], references: [id])
+  periodStart    DateTime     @db.Timestamptz(6)
+  periodEnd      DateTime     @db.Timestamptz(6)
+  // 'mensuelle' | 'trimestrielle'
+  periodType     String
+  // 'draft' | 'computed' | 'validated' | 'filed' | 'rejected'
+  status         String       @default("draft")
+
+  tvaCollecteeTotal  Decimal @db.Decimal(14, 2)
+  tvaDeductibleTotal Decimal @db.Decimal(14, 2)
+  tvaDue             Decimal @db.Decimal(14, 2)
+  creditTva          Decimal @db.Decimal(14, 2)
+
+  regime         String
+  fieldsJson     Json    // full CA3 form fields
+  xmlEdiUrl      String? // Scaleway Object Storage URL
+  filedAt        DateTime? @db.Timestamptz(6)
+  dgfipReference String?
+  createdAt      DateTime  @default(now()) @db.Timestamptz(6)
+  updatedAt      DateTime  @updatedAt @db.Timestamptz(6)
+
+  @@index([orgId])
+  @@map("ca3_declarations")
+}
+
+// ── 8. BetaSignup ─────────────────────────────────────────────────────────────
+// Public beta waitlist — no orgId (unauthenticated).
+
+model BetaSignup {
+  id          String   @id @default(cuid())
+  email       String   @unique
+  name        String
+  firmName    String?
+  country     String   @default("FR")
+  emailSentAt DateTime? @db.Timestamptz(6)
+  createdAt   DateTime @default(now()) @db.Timestamptz(6)
+
+  @@map("beta_signups")
+}
+
+// ── 9. AuditEvent ─────────────────────────────────────────────────────────────
+// Immutable append-only audit log. UPDATE and DELETE are blocked by DB trigger.
+
+model AuditEvent {
+  id    String @id @default(uuid()) @db.Uuid
+  orgId String
+  org   Organization @relation(fields: [orgId], references: [id])
+
+  // 'user' | 'agent' | 'system'
+  actorType String
+  actorId   String
+
+  // 'fec.upload' | 'entry.classified' | 'declaration.computed' | 'declaration.filed'
+  action     String
+  entityType String
+  entityId   String
+
+  // Full context: prompt, model, sources, tokens, latency_ms
+  payload   Json
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+
+  @@index([orgId])
+  @@map("audit_events")
+}

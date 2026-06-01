@@ -1,0 +1,48 @@
+# Scaleway Serverless Container — Stratus Agent (FastAPI)
+# Deploy with: scw container container deploy --from-file infra/scaleway/agent.yaml
+#
+# Prerequisites:
+#   docker push rg.fr-par.scw.cloud/stratus/agent:latest
+
+apiVersion: serverless.scaleway.com/v1beta1
+kind: Container
+metadata:
+  name: stratus-agent
+  namespace: stratus
+
+spec:
+  image: rg.fr-par.scw.cloud/stratus/agent:latest
+  region: fr-par
+
+  scaling:
+    minScale: 1
+    maxScale: 3
+    concurrency: 20  # Lower: each request may do heavy LLM calls
+
+  resources:
+    memoryLimit: 1024
+    cpuLimit: 560  # mVCPU — agent needs more CPU for tokenization/embeddings
+
+  port: 8000
+
+  privacy: private  # Only callable from stratus-api via internal VPC
+
+  environmentVariables:
+    APP_ENV: production
+    # Injected via Doppler / Scaleway secrets at deploy time:
+    # ANTHROPIC_API_KEY
+    # QDRANT_URL
+    # QDRANT_API_KEY
+    # SENTRY_DSN
+    # GIT_COMMIT_SHA
+
+  httpOption: redirected
+
+  healthCheck:
+    httpProbe:
+      path: /health
+    port: 8000
+    failureThreshold: 3
+    successThreshold: 1
+    periodSeconds: 30
+    timeoutSeconds: 10
