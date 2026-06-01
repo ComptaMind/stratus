@@ -42,3 +42,4 @@ venv
 # Prisma
 prisma/migrations
 .github/workflows/
+.vercel
